@@ -9,13 +9,19 @@ if (!isset($_SESSION['email'])) {
 require_once 'config.php';
 
 $adminEmail  = $_SESSION['email'];
-$adminStmt = $conn->prepare("SELECT name FROM students WHERE email = ?");
+$adminStmt = $conn->prepare("SELECT name, role FROM students WHERE email = ?");
 $adminStmt->bind_param("s", $adminEmail);
 $adminStmt->execute();
 $adminResult = $adminStmt->get_result();
 $adminRow    = $adminResult->fetch_assoc();
-$adminName   = $adminRow['name'];
 
+// Only admins may use this page
+if (!$adminRow || $adminRow['role'] !== 'admin') {
+    header("Location: index.php");
+    exit();
+}
+
+$adminName = $adminRow['name'];
 // =====================
 // DELETE STUDENT
 // =====================

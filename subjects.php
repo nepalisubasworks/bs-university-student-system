@@ -7,6 +7,16 @@ if (!isset($_SESSION['email'])) {
 
 require_once 'config.php';
 
+// Only admins may use this page
+$guardStmt = $conn->prepare("SELECT role FROM students WHERE email = ?");
+$guardStmt->bind_param("s", $_SESSION['email']);
+$guardStmt->execute();
+$guardRow = $guardStmt->get_result()->fetch_assoc();
+if (!$guardRow || $guardRow['role'] !== 'admin') {
+    header("Location: index.php");
+    exit();
+}
+
 // =============================================
 // LOAD ALL FACULTY NAMES (for the dropdown)
 // =============================================
