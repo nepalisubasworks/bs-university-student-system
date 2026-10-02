@@ -25,19 +25,35 @@ $adminName = $adminRow['name'];
 // =====================
 // DELETE STUDENT
 // =====================
-if (isset($_GET['delete'])) {
-    $id = intval($_GET['delete']);
-$enrStmt = $conn->prepare("DELETE FROM enrollment WHERE student_id = ? AND student_id IN (SELECT id FROM students WHERE role = 'student')");
-$enrStmt->bind_param("i", $id);
-$enrStmt->execute();
+// Security token: one secret per login session.
+// The delete form sends it back to prove the request came from our own page.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
-$delStmt = $conn->prepare("DELETE FROM students WHERE id = ? AND role = 'student'");
-$delStmt->bind_param("i", $id);
-$delStmt->execute();
+// =====================
+// DELETE STUDENT
+// =====================
+// Only accepts POST requests that carry the correct token
+if (isset($_POST['delete_student'])) {
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        http_response_code(403);
+        exit("Invalid request.");
+    }
+
+    $id = intval($_POST['delete_student']);
+
+    $enrStmt = $conn->prepare("DELETE FROM enrollment WHERE student_id = ? AND student_id IN (SELECT id FROM students WHERE role = 'student')");
+    $enrStmt->bind_param("i", $id);
+    $enrStmt->execute();
+
+    $delStmt = $conn->prepare("DELETE FROM students WHERE id = ? AND role = 'student'");
+    $delStmt->bind_param("i", $id);
+    $delStmt->execute();
+
     header("Location: admin_page.php");
     exit();
 }
-
 // =====================
 // EDIT STUDENT DETAILS
 // =====================
@@ -520,10 +536,12 @@ if ($viewAll) {
                                             '<?= htmlspecialchars(addslashes($student['course'])); ?>',
                                             '<?= htmlspecialchars(addslashes($selectedCourseDuration)); ?>'
                                         )">Edit</button>
-                                        <a href="admin_page.php?delete=<?= $student['id']; ?>&faculty=<?= urlencode($selectedFaculty); ?>&course=<?= urlencode($selectedCourse); ?>"
-                                           onclick="return confirm('Delete this student?')" style="text-decoration:none;">
-                                            <button type="button" class="delete-option">Delete</button>
-                                        </a>
+                                        <form method="POST" action="admin_page.php" style="margin:0;"
+      onsubmit="return confirm('Delete this student?')">
+    <input type="hidden" name="csrf_token"     value="<?= htmlspecialchars($_SESSION['csrf_token']); ?>">
+    <input type="hidden" name="delete_student" value="<?= $student['id']; ?>">
+    <button type="submit" class="delete-option">Delete</button>
+</form>
                                     </div>
                                 </div>
                             </td>
