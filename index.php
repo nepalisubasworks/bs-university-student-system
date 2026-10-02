@@ -111,8 +111,7 @@ while ($c = $courseResultIndex->fetch_assoc()) {
                 <?php endforeach; ?>
             </select>
 
-            <select name="course" id="course" data-old-course="<?= $old['course'] ?? ''; ?>" required>
-                <option value="" disabled selected>Select Course</option>
+            <select name="course" id="course" data-old-course="<?= htmlspecialchars($old['course'] ?? ''); ?>" required>                <option value="" disabled selected>Select Course</option>
             </select>
 
             <input type="text" name="dob" placeholder="Date of Birth (YYYY-MM-DD)" autocomplete="off" value="<?= $old['dob'] ?? ''; ?>" required>
