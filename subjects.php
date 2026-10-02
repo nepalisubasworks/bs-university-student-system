@@ -187,7 +187,9 @@ if (isset($_GET['delete'])) {
     $course  = $_GET['course']  ?? '';
     $faculty = $_GET['faculty'] ?? '';
 
-    $conn->query("DELETE FROM subjects WHERE id='$id'");
+    $delSub = $conn->prepare("DELETE FROM subjects WHERE id = ?");
+$delSub->bind_param("i", $id);
+$delSub->execute();
     header("Location: subjects.php?faculty=" . urlencode($faculty) . "&course=" . urlencode($course));
     exit();
 }
@@ -214,7 +216,10 @@ if ($selectedFaculty != '' && $selectedCourse != '') {
     $subStmt->execute();
     $subjects = $subStmt->get_result();
 
-    $natureResult = $conn->query("SELECT type_nature FROM course WHERE course_name='$selectedCourse'");
+$natureStmt = $conn->prepare("SELECT type_nature FROM course WHERE course_name = ?");
+$natureStmt->bind_param("s", $selectedCourse);
+$natureStmt->execute();
+$natureResult = $natureStmt->get_result();
     if ($natureResult && $natureResult->num_rows > 0) {
         $currentNature = $natureResult->fetch_assoc()['type_nature'];
     }

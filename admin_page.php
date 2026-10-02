@@ -9,7 +9,10 @@ if (!isset($_SESSION['email'])) {
 require_once 'config.php';
 
 $adminEmail  = $_SESSION['email'];
-$adminResult = $conn->query("SELECT name FROM students WHERE email='$adminEmail'");
+$adminStmt = $conn->prepare("SELECT name FROM students WHERE email = ?");
+$adminStmt->bind_param("s", $adminEmail);
+$adminStmt->execute();
+$adminResult = $adminStmt->get_result();
 $adminRow    = $adminResult->fetch_assoc();
 $adminName   = $adminRow['name'];
 
@@ -18,7 +21,13 @@ $adminName   = $adminRow['name'];
 // =====================
 if (isset($_GET['delete'])) {
     $id = intval($_GET['delete']);
-    $conn->query("DELETE FROM students WHERE id='$id' AND role='student'");
+$enrStmt = $conn->prepare("DELETE FROM enrollment WHERE student_id = ? AND student_id IN (SELECT id FROM students WHERE role = 'student')");
+$enrStmt->bind_param("i", $id);
+$enrStmt->execute();
+
+$delStmt = $conn->prepare("DELETE FROM students WHERE id = ? AND role = 'student'");
+$delStmt->bind_param("i", $id);
+$delStmt->execute();
     header("Location: admin_page.php");
     exit();
 }
@@ -100,12 +109,19 @@ if (isset($_POST['update'])) {
     }
 
     if ($room !== '') {
-        $conn->query("UPDATE students SET room_number='$room' WHERE course='$course'");
+       $roomStmt = $conn->prepare("UPDATE students SET room_number = ? WHERE course = ?");
+$roomStmt->bind_param("ss", $room, $course);
+$roomStmt->execute();
     } else {
-        $existing = $conn->query("SELECT room_number FROM students WHERE course='$course' AND room_number IS NOT NULL AND room_number != '' LIMIT 1");
+        $existStmt = $conn->prepare("SELECT room_number FROM students WHERE course = ? AND room_number IS NOT NULL AND room_number != '' LIMIT 1");
+$existStmt->bind_param("s", $course);
+$existStmt->execute();
+$existing = $existStmt->get_result();
         if ($existing && $existing->num_rows > 0) {
             $row = $existing->fetch_assoc();
-            $conn->query("UPDATE students SET room_number='" . $row['room_number'] . "' WHERE id='$id'");
+            $roomStmt2 = $conn->prepare("UPDATE students SET room_number = ? WHERE id = ?");
+$roomStmt2->bind_param("si", $row['room_number'], $id);
+$roomStmt2->execute();
         }
     }
 
