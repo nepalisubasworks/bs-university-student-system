@@ -1,0 +1,692 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: serif;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #e2e2e2, #c9d6ff);
+    color: #333;
+}
+
+body.login-page {
+    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('bg.jpg');
+    background-size: cover;
+    background-position: center 35%;
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+}
+
+.container {
+    margin: 0 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+    padding: 20px 0;
+    overflow: hidden;
+}
+
+.form-box {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none;
+    backdrop-filter: blur(1px);
+    margin-top: 100px;
+}
+
+.form-box.active {
+    display: block;
+}
+
+h2 {
+    font-size: 34px;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #7494ec;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    background: #eee;
+    border-radius: 6px;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: #7494ec;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.05s;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+button:hover {
+    background: #6884d3;
+}
+
+p {
+    font-size: 14.5px;
+    text-align: center;
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+p a {
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    padding: 12px;
+    background: #f8d7da;
+    border-radius: 6px;
+    font-size: 16px;
+    color: #a42834;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+span {
+    color: #7494ec;
+}
+
+.box {
+    font-size: 22px;
+    width: 60%;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.box button {
+    display: block;
+    width: 300px;
+    margin: 20px 0 auto;
+}
+
+/* ── Details Card (Student Dashboard) ── */
+.details-card {
+    background: #f4f7ff;
+    border-radius: 10px;
+    padding: 20px 25px;
+    margin: 20px 0;
+}
+
+.details-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #7494ec;
+}
+
+.details-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.details-table tr {
+    border-bottom: 1px solid #dde3f5;
+}
+
+.details-table td {
+    padding: 10px 8px;
+    font-size: 16px;
+}
+
+.details-table td:first-child {
+    width: 160px;
+    color: #555;
+}
+
+/* ── Add Course Card ── */
+.add-card {
+    background: #f4f7ff;
+    border-radius: 10px;
+    padding: 20px 25px;
+    margin: 20px 0;
+}
+
+.add-card h3 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #7494ec;
+}
+
+.add-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.add-form input {
+    width: 200px;
+    margin-bottom: 0;
+}
+
+.add-form button {
+    width: auto;
+    padding: 12px 20px;
+    margin-bottom: 0;
+}
+
+/* ── Modal Popup ── */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    padding: 20px;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+.modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    margin-top: 14px;
+    font-weight: 500;
+    color: #555;
+}
+
+.modal-content label:first-of-type {
+    margin-top: 0;
+}
+
+.btn-close {
+    width: 100%;
+    margin-top: 20px;
+    background: #7494ec;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+/* ── University Header ── */
+.university-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0px;
+    width: 100%;
+    background: rgba(3, 17, 68, 0.85);
+    border-bottom: 2.5px solid #FFD700;
+    position: fixed;
+    top: 0;
+    z-index: 100;
+}
+
+.university-header img {
+    height: 85px;
+    width: auto;
+    object-fit: contain;
+    object-position: center;
+    align-self: center;
+}
+
+.university-header h2 {
+    font-size: 45px;
+    font-family: 'Georgia', serif;
+    align-self: flex-end;
+    padding-bottom: 0px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    background: linear-gradient(to bottom, #FFD700, #B8860B, #FFD700);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(1px 1px 3px rgba(0,0,0,0.6));
+}
+
+/* ====================================================== */
+/* ============ ADMIN DASHBOARD ========================= */
+/* ====================================================== */
+
+:root {
+    --navy: #031144;
+    --gold: #D4AF37;
+    --text-dark: #1c2233;
+    --border: #e1e5f0;
+    --danger: #d64550;
+    --success: #3d8a52;
+    --card: #ffffff;
+}
+
+body.admin-locked {
+    height: 100%;
+    overflow: hidden;
+}
+
+.admin-box {
+    max-width: 100%;
+    width: 98%;
+    margin: 0 auto;
+    padding: 0 10px 40px;
+    position: relative;
+    font-family: 'Georgia', serif;
+    min-height: 100vh;
+}
+
+.logout-link {
+    position: absolute;
+    top: 50%;
+    right: 24px;
+    transform: translateY(-50%);
+    color: #FFD700;
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: none;
+    font-family: Georgia, serif;
+    cursor: pointer;
+}
+
+.logout-link:hover {
+    text-decoration: underline;
+}
+
+.admin-box h1 {
+    font-size: 32px;
+    font-weight: normal;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 2px;
+}
+
+.admin-box h1 span {
+    color: var(--navy);
+    font-weight: bold;
+}
+
+.page-subtitle {
+    text-align: center;
+    font-size: 19px;
+    font-weight: bold;
+    color: var(--navy);
+    margin: 2px 0 2px;
+    letter-spacing: 0.5px;
+}
+
+.back-links-row {
+    text-align: left;
+    margin-bottom: 0;
+}
+
+.back-link {
+    display: inline-block;
+    margin: 0 14px 0 0;
+    color: var(--navy);
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 15px;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Faculty / Course cards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+    margin: 18px 0;
+}
+
+.faculty-card, .course-card {
+    background: #fff;
+    color: var(--navy);
+    padding: 26px 22px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    border-top: 4px solid var(--gold);
+    box-shadow: 0 2px 8px rgba(3,17,68,0.08);
+    transition: transform 0.15s ease;
+}
+
+.faculty-card:hover, .course-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Ledger book table */
+.table-wrap {
+    background: #fffdf8;
+    border-radius: 4px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: calc(100vh - 240px);
+    box-shadow: 0 6px 24px rgba(3, 17, 68, 0.12);
+    border: 1px solid #d8c9a3;
+    margin: 0 auto 20px;
+    position: relative;
+    width: 100%;
+}
+
+.table-wrap::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.table-wrap::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+    background-color: rgba(184, 164, 104, 0);
+    border-radius: 10px;
+    transition: background-color 0.5s ease;
+}
+
+.table-wrap.scroll-active::-webkit-scrollbar-thumb {
+    background-color: rgba(184, 164, 104, 1);
+}
+.course-ledger {
+    margin: 0 auto 10px;
+    max-height: calc(100vh - 250px);
+}
+.all-students-ledger {
+    margin: 0 auto 10px;
+    max-height: calc(100vh - 250px);
+}
+
+.student-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.student-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Georgia', serif;
+    min-width: unset;
+}
+
+/* Header row */
+.student-table th {
+    background: var(--navy);
+    color: #D4AF37;
+    padding: 14px 10px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    border-bottom: 2px solid #D4AF37;
+    border-right: 1px solid #1a2a6e;
+}
+
+/* Data rows */
+.student-table td {
+    padding: 6px 10px;
+    border-bottom: 1px solid #d8c9a3;
+    border-right: 1px solid #e8dfc4;
+    font-size: 15px;
+    color: #1c2233;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.student-table tbody tr:nth-child(even) {
+    background: #fbf8ef;
+}
+
+.student-table tbody tr:hover {
+    background: #f3ecd6;
+}
+
+.student-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.student-table td:first-child,
+.student-table th:first-child {
+    text-align: center;
+    width: 36px;
+    color: var(--navy);
+    font-weight: bold;
+}
+
+.student-table input[type="text"] {
+    width: 55px;
+    padding: 5px 6px;
+    font-size: 12px;
+    border: 1px solid #d8c9a3;
+    border-radius: 4px;
+    background: #fff;
+    font-family: 'Georgia', serif;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.student-table input[type="text"]:focus {
+    outline: none;
+    border-color: #D4AF37;
+}
+
+.action-cell {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    position: relative;
+    justify-content: flex-start;
+}
+
+.btn-update {
+    font-family: 'Georgia', serif;
+    background: #7494ec;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px 10px;
+    width: auto;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.btn-update:hover {
+    background: #6884d3;
+}
+
+/* ── Delete button (used in subjects.php) ── */
+.btn-delete {
+    font-family: 'Georgia', serif;
+    background: #d64550;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 6px 10px;
+    width: auto;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.btn-delete:hover {
+    background: #b83540;
+}
+
+.btn-menu {
+    background: none;
+    color: var(--navy);
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    width: 26px;
+    height: 26px;
+    cursor: pointer;
+    line-height: 1;
+    margin-bottom: 0;
+    vertical-align: middle;
+    margin-left: -8px;
+    margin-top: 0px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-menu:hover {
+    background: none;
+    color: #000;
+    font-weight: 900;
+}
+
+.action-dropdown {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: 0;
+    background: #fff;
+    border: 1px solid #d8c9a3;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    z-index: 50;
+    min-width: 110px;
+    overflow: hidden;
+}
+
+.action-dropdown.open {
+    display: block;
+}
+
+.action-dropdown button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border: none;
+    background: #fff;
+    font-size: 13px;
+    font-family: 'Georgia', serif;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.action-dropdown button.edit-option {
+    color: #3d8a52;
+}
+
+.action-dropdown button.delete-option {
+    color: #d64550;
+}
+
+.action-dropdown button:hover {
+    background: #f3ecd6;
+}
+
+.admin-box .error-message {
+    text-align: left;
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    margin: 4px 0 6px;
+}
+
+.search-bar input {
+    width: 320px;
+    margin-bottom: 0;
+    padding: 11px 14px;
+    font-family: Arial, sans-serif;
+}
+
+.search-bar button {
+    width: auto;
+    padding: 11px 22px;
+    margin-bottom: 0;
+}
+.header-links {
+    position: absolute;
+    top: 50%;
+    right: 10px;   /* ← lowered from 24px — pushes buttons closer to the edge, further from center text */
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-btn {
+    color: #FFD700;
+    font-size: 12px;
+    font-weight: bold;
+    text-decoration: none;
+    font-family: Georgia, serif;
+    padding: 5px 12px;
+    border: 1.5px solid #FFD700;
+    border-radius: 6px;
+    background: transparent;
+    cursor: pointer;
+    margin-bottom: 0;
+    letter-spacing: 0.5px;
+    transition: 0.2s;
+}
+
+.header-btn:hover {
+    background: #FFD700;
+    color: #031144;
+}
+
+/* Move logout-link inside header-links — remove its absolute positioning */
+.header-links .logout-link {
+    position: static;
+    transform: none;
+}
