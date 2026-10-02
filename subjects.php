@@ -7,6 +7,12 @@ if (!isset($_SESSION['email'])) {
 
 require_once 'config.php';
 
+// Security token: one secret per login session.
+// Delete forms send it back to prove the request came from our own page.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Only admins may use this page
 $guardStmt = $conn->prepare("SELECT role FROM students WHERE email = ?");
 $guardStmt->bind_param("s", $_SESSION['email']);
@@ -141,6 +147,12 @@ if (isset($_POST['update_course_row'])) {
 // DELETE COURSE
 // =============================================
 if (isset($_POST['delete_course'])) {
+    // Reject the request unless it carries our secret token
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        http_response_code(403);
+        exit("Invalid request.");
+    }
+
     $course_name = trim($_POST['course_to_delete'] ?? '');
     $faculty     = $_POST['faculty']               ?? '';
 
@@ -163,12 +175,34 @@ if (isset($_POST['add'])) {
     $subject_code = $_POST['subject_code'] ?? '';
     $teacher_name = $_POST['teacher_name'] ?? '';
 
-    $conn->query("INSERT INTO subjects (course, subject_name, subject_code, teacher_name)
-                  VALUES ('$course', '$subject_name', '$subject_code', '$teacher_name')");
+    // Prepared statement: the ? marks keep user input out of the SQL text
+    $addStmt = $conn->prepare("INSERT INTO subjects (course, subject_name, subject_code, teacher_name) VALUES (?, ?, ?, ?)");
+    $addStmt->bind_param("ssss", $course, $subject_name, $subject_code, $teacher_name);
+    $addStmt->execute();
+
     header("Location: subjects.php?faculty=" . urlencode($faculty) . "&course=" . urlencode($course));
     exit();
 }
 
+// =============================================
+// UPDATE SUBJECT
+// =============================================
+if (isset($_POST['update'])) {
+    $id           = intval($_POST['id']);
+    $subject_name = $_POST['subject_name'];
+    $subject_code = $_POST['subject_code'];
+    $teacher_name = $_POST['teacher_name'];
+    $course       = $_POST['course'];
+    $faculty      = $_POST['faculty'];
+
+    // Prepared statement: "sssi" = three strings, then one integer (the id)
+    $updStmt = $conn->prepare("UPDATE subjects SET subject_name = ?, subject_code = ?, teacher_name = ? WHERE id = ?");
+    $updStmt->bind_param("sssi", $subject_name, $subject_code, $teacher_name, $id);
+    $updStmt->execute();
+
+    header("Location: subjects.php?faculty=" . urlencode($faculty) . "&course=" . urlencode($course));
+    exit();
+}
 // =============================================
 // UPDATE SUBJECT
 // =============================================
@@ -664,10 +698,11 @@ $natureResult = $natureStmt->get_result();
 
                         <!-- Hidden delete form (invisible, submitted by JS) -->
                         <form id="del-<?= md5($c['name']); ?>" action="subjects.php" method="POST" style="display:none;">
-                            <input type="hidden" name="faculty"          value="<?= htmlspecialchars($selectedFaculty); ?>">
-                            <input type="hidden" name="course_to_delete" value="<?= htmlspecialchars($c['name']); ?>">
-                            <input type="hidden" name="delete_course"    value="1">
-                        </form>
+    <input type="hidden" name="csrf_token"       value="<?= htmlspecialchars($_SESSION['csrf_token']); ?>">
+    <input type="hidden" name="faculty"          value="<?= htmlspecialchars($selectedFaculty); ?>">
+    <input type="hidden" name="course_to_delete" value="<?= htmlspecialchars($c['name']); ?>">
+    <input type="hidden" name="delete_course"    value="1">
+</form>
                     </td>
                 </tr>
                 <?php endforeach; ?>
