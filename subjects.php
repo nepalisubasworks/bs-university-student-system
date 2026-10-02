@@ -226,18 +226,23 @@ if (isset($_POST['update'])) {
 // =============================================
 // DELETE SUBJECT
 // =============================================
-if (isset($_GET['delete'])) {
-    $id      = intval($_GET['delete']);
-    $course  = $_GET['course']  ?? '';
-    $faculty = $_GET['faculty'] ?? '';
+if (isset($_POST['delete_subject'])) {
+    // Reject the request unless it carries our secret token
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        http_response_code(403);
+        exit("Invalid request.");
+    }
+
+    $id      = intval($_POST['delete_subject']);
+    $course  = $_POST['course']  ?? '';
+    $faculty = $_POST['faculty'] ?? '';
 
     $delSub = $conn->prepare("DELETE FROM subjects WHERE id = ?");
-$delSub->bind_param("i", $id);
-$delSub->execute();
+    $delSub->bind_param("i", $id);
+    $delSub->execute();
     header("Location: subjects.php?faculty=" . urlencode($faculty) . "&course=" . urlencode($course));
     exit();
 }
-
 // =============================================
 // GET SELECTED FACULTY AND COURSE FROM URL
 // =============================================
@@ -759,14 +764,17 @@ $natureResult = $natureStmt->get_result();
                                 onclick="updateSubject(<?= $sub['id']; ?>)">
                                 Update
                             </button>
-                            <a href="subjects.php?delete=<?= $sub['id']; ?>&course=<?= urlencode($selectedCourse); ?>&faculty=<?= urlencode($selectedFaculty); ?>"
-                               onclick="return confirm('Delete this subject?')"
-                               style="text-decoration:none;">
-                                <button type="button" class="btn-delete"
-                                    style="width:auto; padding:7px 14px; font-size:13px; margin-bottom:0;">
-                                    Delete
-                                </button>
-                            </a>
+                            <form method="POST" action="subjects.php" style="margin:0;"
+      onsubmit="return confirm('Delete this subject?')">
+    <input type="hidden" name="csrf_token"     value="<?= htmlspecialchars($_SESSION['csrf_token']); ?>">
+    <input type="hidden" name="delete_subject" value="<?= $sub['id']; ?>">
+    <input type="hidden" name="course"         value="<?= htmlspecialchars($selectedCourse); ?>">
+    <input type="hidden" name="faculty"        value="<?= htmlspecialchars($selectedFaculty); ?>">
+    <button type="submit" class="btn-delete"
+        style="width:auto; padding:7px 14px; font-size:13px; margin-bottom:0;">
+        Delete
+    </button>
+</form>
                         </div>
                     </td>
                 </tr>
