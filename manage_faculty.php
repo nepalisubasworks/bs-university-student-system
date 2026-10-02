@@ -17,6 +17,12 @@ if (!$guardRow || $guardRow['role'] !== 'admin') {
     exit();
 }
 
+// Security token: one secret per login session.
+// Delete forms must send it back, which proves the request
+// came from our own page and not from a hidden link elsewhere.
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 function h($val) {
     return htmlspecialchars($val ?? '', ENT_QUOTES, 'UTF-8');
 }
@@ -71,8 +77,14 @@ if (isset($_POST['update_faculty'])) {
 }
 
 // Delete faculty (also deletes its courses)
-if (isset($_GET['delete_faculty'])) {
-    $faculty_id = intval($_GET['delete_faculty']);
+// Only accepts POST requests that carry the correct token
+if (isset($_POST['delete_faculty'])) {
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        http_response_code(403);
+        exit("Invalid request.");
+    }
+
+    $faculty_id = intval($_POST['delete_faculty']);
 
     $stmt1 = $conn->prepare("DELETE FROM course WHERE faculty_id = ?");
     $stmt1->bind_param("i", $faculty_id);
@@ -85,6 +97,7 @@ if (isset($_GET['delete_faculty'])) {
     header("Location: manage_faculty.php");
     exit();
 }
+
 
 // Rename course
 if (isset($_POST['update_course'])) {
@@ -128,8 +141,14 @@ if (isset($_POST['update_course'])) {
 }
 
 // Delete course
-if (isset($_GET['delete_course'])) {
-    $course_id = intval($_GET['delete_course']);
+// Only accepts POST requests that carry the correct token
+if (isset($_POST['delete_course'])) {
+    if (!hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'] ?? '')) {
+        http_response_code(403);
+        exit("Invalid request.");
+    }
+
+    $course_id = intval($_POST['delete_course']);
     $stmt = $conn->prepare("DELETE FROM course WHERE course_id = ?");
     $stmt->bind_param("i", $course_id);
     $stmt->execute();
@@ -376,12 +395,13 @@ $faculties = $conn->query("SELECT * FROM faculty ORDER BY faculty_id");
                             <button type="button" class="btn-update"
                                 style="width:auto; padding:6px 14px; font-size:13px; margin-bottom:0;"
                                 onclick="updateFaculty(<?= $f['faculty_id']; ?>)">Rename</button>
-                            <a href="manage_faculty.php?delete_faculty=<?= $f['faculty_id']; ?>"
-                               onclick="return confirm('Delete this faculty and all its courses?')"
-                               style="text-decoration:none;">
-                                <button type="button" class="btn-delete"
-                                    style="width:auto; padding:6px 14px; font-size:13px; margin-bottom:0;">Delete</button>
-                            </a>
+                            <form method="POST" action="manage_faculty.php" style="margin:0;"
+      onsubmit="return confirm('Delete this faculty and all its courses?')">
+    <input type="hidden" name="csrf_token" value="<?= h($_SESSION['csrf_token']); ?>">
+    <input type="hidden" name="delete_faculty" value="<?= $f['faculty_id']; ?>">
+    <button type="submit" class="btn-delete"
+        style="width:auto; padding:6px 14px; font-size:13px; margin-bottom:0;">Delete</button>
+</form>
                         </div>
                     </td>
                 </tr>
