@@ -6,3 +6,5 @@ uploads/
 users_db.sql
 database_changes.sql
 merge_course_type.sql
+
+config.php

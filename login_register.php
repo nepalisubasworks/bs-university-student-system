@@ -124,6 +124,9 @@ if (isset($_POST['login'])) {
         // Check if password matches
         if (password_verify($password, $student['password'])) {
 
+                        // Start a fresh session ID after login (blocks session fixation)
+            session_regenerate_id(true);
+
             // Save email in session (used to identify the logged-in user)
             $_SESSION['email'] = $student['email'];
 
