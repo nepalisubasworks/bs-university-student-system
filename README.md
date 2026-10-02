@@ -34,7 +34,7 @@ The database has six tables: `students`, `admin`, `faculty`, `course`, `subjects
 
 3. Open phpMyAdmin at `http://localhost/phpmyadmin`, create a database named `users_db`, and import `database.sql` into it.
 4. Copy `config.example.php` to `config.php` and fill in your database details. A default XAMPP install uses the user `root` with an empty password.
-5. Add your first admin account by inserting a row into the `admin` table in phpMyAdmin. Match the way the login code checks the password.
+5. Create your first admin account: register a normal account in the app, then in phpMyAdmin open the `students` table and change that account's `role` value to `admin`. Or open the SQL tab and run `UPDATE students SET role = 'admin' WHERE email = 'your@email.com';`
 6. Open `http://localhost/login_register/` in your browser.
 
 ## Project Structure
