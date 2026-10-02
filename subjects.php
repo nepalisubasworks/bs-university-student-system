@@ -204,26 +204,6 @@ if (isset($_POST['update'])) {
     exit();
 }
 // =============================================
-// UPDATE SUBJECT
-// =============================================
-if (isset($_POST['update'])) {
-    $id           = intval($_POST['id']);
-    $subject_name = $_POST['subject_name'];
-    $subject_code = $_POST['subject_code'];
-    $teacher_name = $_POST['teacher_name'];
-    $course       = $_POST['course'];
-    $faculty      = $_POST['faculty'];
-
-    $conn->query("UPDATE subjects SET
-        subject_name='$subject_name',
-        subject_code='$subject_code',
-        teacher_name='$teacher_name'
-        WHERE id='$id'");
-    header("Location: subjects.php?faculty=" . urlencode($faculty) . "&course=" . urlencode($course));
-    exit();
-}
-
-// =============================================
 // DELETE SUBJECT
 // =============================================
 if (isset($_POST['delete_subject'])) {
